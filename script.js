@@ -534,7 +534,7 @@ function updateAccountModal() {
 
     if (!configured) {
         authStatus.textContent =
-            "To enable sync, add your Supabase project URL and public anon key to supabase-config.js.";
+            "This web is only prototype, the data cannot be saved!";
     } else if (signedIn) {
         authStatus.textContent = "";
     } else {
@@ -1555,7 +1555,7 @@ const MAX_SUMMARY_TRANSCRIPT_LENGTH = 30000;
 $("summarizeLecture").addEventListener("click", async () => {
     const transcript = $("lectureTranscript").value.trim();
     if (!transcript) {
-        summaryStatus.textContent = "Add or record a transcript before generating an AI summary.";
+        summaryStatus.textContent = "The  generated ai summary is not available for now because this web is a protorype.";
         $("lectureTranscript").focus();
         return;
     }
