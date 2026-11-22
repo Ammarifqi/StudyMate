@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Plan your study tasks, focus sessions, and weekly schedule."
+    />
+    <meta name="theme-color" content="#4f7258" />
+    <title>StudyMate</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo">✦</div>
+          <h2>StudyMate</h2>
+        </div>
+
+        <p class="menu-title">WORKSPACE</p>
+
+        <nav>
+          <button class="nav-btn active" data-page="dashboard">
+            Dashboard
+          </button>
+          <button class="nav-btn" data-page="tasks">My Tasks</button>
+          <button class="nav-btn" data-page="planner">Study Planner</button>
+          <button class="nav-btn" data-page="lectures">Lectures & Notes</button>
+          <button class="nav-btn" data-page="focus">Focus Timer</button>
+          <button class="nav-btn" data-page="progress">My Progress</button>
+        </nav>
+
+        <div class="sidebar-note">
+          <h4>Keep going!</h4>
+          <p>Don't stop doing something until you're achieved something.</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p id="today"></p>
+            <h1>Welcome to StudyMate</h1>
+            <p class="subtitle">Let's make today productive.</p>
+            <p
+              class="sync-status"
+              id="syncStatus"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </div>
+          <div class="topbar-actions">
+            <button
+              class="install-button"
+              id="installButton"
+              type="button"
+              hidden
+            >
+              Install app
+            </button>
+            <button
+              class="palette-button"
+              id="paletteButton"
+              type="button"
+              aria-label="Choose theme colour"
+              title="Choose theme colour"
+            >
+              <span
+                class="theme-color-dot"
+                id="themeColorDot"
+                aria-hidden="true"
+              ></span>
+              <span>Colour</span>
+            </button>
+            <button
+              class="theme-toggle"
+              id="themeToggle"
+              type="button"
+              aria-label="Switch to dark mode"
+              aria-pressed="false"
+              title="Switch to dark mode"
+            >
+              <span id="themeIcon" aria-hidden="true">🌙</span>
+            </button>
+            <button class="account-button" id="accountButton" type="button">
+              Sign in
+            </button>
+          </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <section class="page active" id="dashboard">
+          <div class="stats">
+            <button
+              class="stat-card stat-card-button"
+              type="button"
+              data-task-filter="all"
+              aria-label="Show all tasks"
+            >
+              <span class="stat-card-label">Total Tasks</span>
+              <span class="stat-card-value" id="totalTasks">0</span>
+            </button>
+
+            <button
+              class="stat-card stat-card-button"
+              type="button"
+              data-task-filter="completed"
+              aria-label="Show completed tasks"
+            >
+              <span class="stat-card-label">Completed</span>
+              <span class="stat-card-value" id="completedTasks">0</span>
+            </button>
+
+            <div class="stat-card">
+              <p>Focus Sessions</p>
+              <h2 id="focusSessions">0</h2>
+            </div>
+
+            <div class="stat-card">
+              <p>Completion Rate</p>
+              <h2 id="completionRate">0%</h2>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="card">
+              <div class="section-header">
+                <div>
+                  <h2>Today's Tasks</h2>
+                  <p>Manage your daily responsibilities.</p>
+                </div>
+                <button class="primary-btn" id="addTaskBtn">+ Add Task</button>
+              </div>
+
+              <div id="dashboardTasks" class="task-list"></div>
+
+              <div class="progress-section">
+                <div class="progress-label">
+                  <span>Daily Progress</span>
+                  <strong id="dailyPercentage">0%</strong>
+                </div>
+                <div class="progress-bar">
+                  <div id="dailyBar"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="right-column">
+              <div class="card focus-card">
+                <h2>Focus Timer</h2>
+                <p>Stay focused and productive.</p>
+                <div class="timer" id="dashboardTimer">25:00</div>
+                <p id="dashboardTimerMode">FOCUS SESSION</p>
+                <button class="white-btn" id="dashboardStart">
+                  Start Focus
+                </button>
+              </div>
+
+              <div class="card motivation">
+                <h3>Daily Motivation</h3>
+                <p id="motivationText">
+                  "For indeed, with hardship [will be] ease [i.e., relief].
+                  Indeed, with hardship [will be] ease."
+                </p>
+              </div>
+
+              <div class="card weekly-goal-card">
+                <div class="weekly-goal-heading">
+                  <div>
+                    <h3>Weekly focus goal</h3>
+                    <p id="weeklyGoalWeek"></p>
+                  </div>
+                  <button
+                    class="secondary-btn"
+                    id="editWeeklyGoal"
+                    type="button"
+                  >
+                    Set goal
+                  </button>
+                </div>
+                <div class="weekly-goal-progress-label">
+                  <span id="weeklyGoalSummary">0 of 5 sessions</span>
+                  <strong id="weeklyGoalPercent">0%</strong>
+                </div>
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  id="weeklyGoalProgress"
+                  aria-label="Weekly focus goal progress"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                >
+                  <div id="weeklyGoalBar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TASKS -->
+        <section class="page" id="tasks">
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <h2>My Tasks</h2>
+                <p>Organize your assignments and responsibilities.</p>
+              </div>
+              <div class="task-header-actions">
+                <button class="secondary-btn" id="exportCsvBtn" type="button">
+                  Export CSV
+                </button>
+                <button class="secondary-btn" id="backupJsonBtn" type="button">
+                  Backup JSON
+                </button>
+                <button class="secondary-btn" id="reminderToggle" type="button">
+                  Enable reminders
+                </button>
+                <button class="primary-btn" id="addTaskBtn2" type="button">
+                  + Add Task
+                </button>
+              </div>
+            </div>
+
+            <p
+              class="task-action-status"
+              id="taskActionStatus"
+              role="status"
+              aria-live="polite"
+            ></p>
+            <div class="task-filters" aria-label="Search and filter tasks">
+              <div class="task-search">
+                <label class="sr-only" for="taskSearch">Search tasks</label>
+                <input
+                  id="taskSearch"
+                  type="search"
+                  placeholder="Search tasks..."
+                  autocomplete="off"
+                />
+              </div>
+              <label class="sr-only" for="taskStatusFilter">Task status</label>
+              <select id="taskStatusFilter">
+                <option value="all">All statuses</option>
+                <option value="open">To do</option>
+                <option value="completed">Completed</option>
+              </select>
+              <label class="sr-only" for="taskPriorityFilter">Priority</label>
+              <select id="taskPriorityFilter">
+                <option value="all">All priorities</option>
+                <option value="High">High priority</option>
+                <option value="Medium">Medium priority</option>
+                <option value="Low">Low priority</option>
+              </select>
+              <label class="sr-only" for="taskCategoryFilter">Category</label>
+              <select id="taskCategoryFilter">
+                <option value="all">All categories</option>
+                <option value="Study">Study</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+              </select>
+              <label class="sr-only" for="taskSort">Sort tasks</label>
+              <select id="taskSort">
+                <option value="soonest">Due date: soonest</option>
+                <option value="latest">Due date: latest</option>
+                <option value="priority">Priority: high to low</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+              <button
+                class="secondary-btn task-filter-clear"
+                id="clearTaskFilters"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+            <p class="task-result-count" id="taskResultCount" role="status"></p>
+            <div id="allTasks" class="task-list"></div>
+          </div>
+        </section>
+
+        <!-- PLANNER -->
+        <section class="page" id="planner">
+          <div class="card">
+            <h2>Weekly Study Planner</h2>
+            <p>Plan your learning activities throughout the week.</p>
+
+            <div class="planner-grid">
+              <div>
+                <h3>Monday</h3>
+                <p>9 AM - Review Notes</p>
+                <p>2 PM - Assignments</p>
+              </div>
+              <div>
+                <h3>Tuesday</h3>
+                <p>10 AM - Study Session</p>
+                <p>4 PM - Practice Questions</p>
+              </div>
+              <div>
+                <h3>Wednesday</h3>
+                <p>9 AM - Reading</p>
+                <p>3 PM - Group Discussion</p>
+              </div>
+              <div>
+                <h3>Thursday</h3>
+                <p>11 AM - Project Work</p>
+                <p>4 PM - Revision</p>
+              </div>
+              <div>
+                <h3>Friday</h3>
+                <p>9 AM - Weekly Revision</p>
+                <p>2 PM - Check Deadlines</p>
+              </div>
+              <div>
+                <h3>Weekend</h3>
+                <p>Flexible - Catch Up</p>
+                <p>Rest and Recharge</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LECTURES AND NOTES -->
+        <section class="page" id="lectures">
+          <div class="lecture-page-heading">
+            <div>
+              <p class="lecture-eyebrow">YOUR STUDY WORKSPACE</p>
+              <h2>Lectures &amp; notes</h2>
+              <p>
+                Plan your classes, capture the important bits, and turn them
+                into study notes.
+              </p>
+            </div>
+            <aside class="lecture-privacy">
+              <span class="privacy-check" aria-hidden="true">✓</span>
+              <div>
+                <strong>Private by default</strong>
+                <p>
+                  Recordings stay on this device. Live transcription may use
+                  your browser's speech service; AI sends the transcript to
+                  OpenAI only on request.
+                </p>
+              </div>
+            </aside>
+          </div>
+
+          <div class="lecture-overview-grid">
+            <div class="card lecture-section-card">
+              <div class="lecture-section-header">
+                <span class="lecture-step">01</span>
+                <div>
+                  <h2>Weekly timetable</h2>
+                  <p>Add your recurring class times.</p>
+                </div>
+              </div>
+              <form class="lecture-form" id="lectureForm">
+                <div>
+                  <label for="lectureName">Lecture or subject</label>
+                  <input
+                    id="lectureName"
+                    type="text"
+                    maxlength="100"
+                    required
+                    placeholder="e.g. Chemistry 101"
+                  />
+                </div>
+                <div>
+                  <label for="lectureDay">Day</label>
+                  <select id="lectureDay" required>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                    <option value="0">Sunday</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="lectureStart">Start time</label>
+                  <input id="lectureStart" type="time" required />
+                </div>
+                <div>
+                  <label for="lectureEnd">End time</label>
+                  <input id="lectureEnd" type="time" required />
+                </div>
+                <div>
+                  <label for="lectureLocation"
+                    >Room or link <span>(optional)</span></label
+                  >
+                  <input
+                    id="lectureLocation"
+                    type="text"
+                    maxlength="100"
+                    placeholder="e.g. Room B12"
+                  />
+                </div>
+                <button class="primary-btn" type="submit">Add lecture</button>
+              </form>
+              <p
+                class="lecture-status"
+                id="lectureStatus"
+                role="status"
+                aria-live="polite"
+              ></p>
+              <div class="lecture-list" id="lectureList"></div>
+            </div>
+
+            <div class="card lecture-section-card recording-card">
+              <div class="lecture-section-header">
+                <span class="lecture-step">02</span>
+                <div>
+                  <h2>Record a lecture</h2>
+                  <p>
+                    Choose a class, then capture audio from your microphone.
+                  </p>
+                </div>
+              </div>
+              <div class="recording-controls">
+                <div>
+                  <label for="recordingLecture"
+                    >Scheduled lecture <span>(optional)</span></label
+                  >
+                  <select id="recordingLecture">
+                    <option value="">No scheduled lecture</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="recordingTitle">Recording title</label>
+                  <input
+                    id="recordingTitle"
+                    type="text"
+                    maxlength="100"
+                    placeholder="e.g. Week 1 introduction"
+                  />
+                </div>
+                <div class="recording-buttons">
+                  <button class="primary-btn" id="startRecording" type="button">
+                    Start recording
+                  </button>
+                  <button
+                    class="secondary-btn stop-recording-btn"
+                    id="stopRecording"
+                    type="button"
+                    disabled
+                  >
+                    Stop recording
+                  </button>
+                  <span
+                    class="recording-time"
+                    id="recordingTime"
+                    aria-live="polite"
+                    >00:00</span
+                  >
+                </div>
+              </div>
+              <p
+                class="lecture-status"
+                id="recordingStatus"
+                role="status"
+                aria-live="polite"
+              >
+                Recording needs microphone permission and HTTPS or localhost.
+                Live transcription depends on your browser and may use its
+                online speech service.
+              </p>
+            </div>
+          </div>
+
+          <div class="card lecture-notes-card">
+            <div class="lecture-section-header">
+              <span class="lecture-step">03</span>
+              <div>
+                <h2>Turn your transcript into notes</h2>
+                <p>
+                  Review the transcript, generate an AI summary, then edit and
+                  save it.
+                </p>
+              </div>
+            </div>
+            <div class="notes-editor-grid">
+              <div class="note-editor-panel">
+                <div class="note-editor-heading">
+                  <label for="lectureTranscript">Lecture transcript</label>
+                  <span>EDITABLE</span>
+                </div>
+                <textarea
+                  id="lectureTranscript"
+                  rows="12"
+                  placeholder="Live transcript appears here when supported. You can also type or paste lecture text."
+                ></textarea>
+                <button
+                  class="secondary-btn"
+                  id="summarizeLecture"
+                  type="button"
+                >
+                  ✦ Generate AI summary
+                </button>
+              </div>
+              <div class="note-editor-panel summary-editor-panel">
+                <div class="note-editor-heading">
+                  <label for="lectureSummary">Study notes</label>
+                  <span>AI DRAFT · EDIT BEFORE SAVING</span>
+                </div>
+                <textarea
+                  id="lectureSummary"
+                  rows="12"
+                  placeholder="Your structured summary will appear here. Review and edit it before saving."
+                ></textarea>
+                <button
+                  class="primary-btn"
+                  id="saveLectureNote"
+                  type="button"
+                  disabled
+                >
+                  Save notes
+                </button>
+              </div>
+            </div>
+            <p
+              class="lecture-status summary-status"
+              id="summaryStatus"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </div>
+
+          <div class="card saved-lectures-card">
+            <div class="lecture-section-header">
+              <span class="lecture-step">04</span>
+              <div>
+                <h2>Saved recordings &amp; notes</h2>
+                <p>Your recordings and notes, all in one place.</p>
+              </div>
+            </div>
+            <div class="lecture-list" id="recordingList"></div>
+          </div>
+        </section>
+
+        <!-- FOCUS TIMER -->
+        <section class="page" id="focus">
+          <div class="card focus-page">
+            <h2>Pomodoro Focus Timer</h2>
+            <p>Concentrate on one task at a time.</p>
+
+            <div class="timer large-timer" id="mainTimer">25:00</div>
+            <h3 id="timerMode">FOCUS SESSION</h3>
+
+            <div class="timer-controls">
+              <button class="primary-btn" id="startTimer">Start</button>
+              <button class="secondary-btn" id="pauseTimer">Pause</button>
+              <button class="secondary-btn" id="resetTimer">Reset</button>
+            </div>
+
+            <fieldset class="timer-duration-setting">
+              <legend>Study duration</legend>
+              <div class="timer-duration-controls">
+                <button
+                  class="secondary-btn"
+                  id="decreaseFocusDuration"
+                  type="button"
+                  aria-label="Decrease study duration by 5 minutes"
+                >
+                  -
+                </button>
+                <label class="sr-only" for="focusDurationInput">
+                  Study duration in minutes
+                </label>
+                <input
+                  id="focusDurationInput"
+                  type="number"
+                  min="5"
+                  max="180"
+                  step="1"
+                  value="25"
+                  inputmode="numeric"
+                  aria-describedby="focusDurationHelp"
+                />
+                <span>minutes</span>
+                <button
+                  class="secondary-btn"
+                  id="increaseFocusDuration"
+                  type="button"
+                  aria-label="Increase study duration by 5 minutes"
+                >
+                  +
+                </button>
+              </div>
+              <p class="timer-duration-help" id="focusDurationHelp">
+                Choose 5 to 180 minutes. Use the buttons to adjust by 5 minutes.
+              </p>
+            </fieldset>
+
+            <div class="timer-modes">
+              <button class="secondary-btn" id="focusMode">25 Min Focus</button>
+              <button class="secondary-btn" id="breakMode">5 Min Break</button>
+            </div>
+
+            <p class="timer-help">
+              Choose a study length that works for you, then take a 5-minute
+              break.
+            </p>
+          </div>
+        </section>
+
+        <!-- PROGRESS -->
+        <section class="page" id="progress">
+          <div class="card">
+            <h2>Your Productivity Report</h2>
+            <p>Monitor your achievements and improvement.</p>
+
+            <div class="big-progress" id="bigProgress">0%</div>
+            <p>Overall Task Completion</p>
+
+            <div class="progress-bar">
+              <div id="bigBar"></div>
+            </div>
+
+            <div class="stats progress-stats">
+              <div class="stat-card">
+                <p>Total Tasks</p>
+                <h2 id="pTotal">0</h2>
+              </div>
+              <div class="stat-card">
+                <p>Completed Tasks</p>
+                <h2 id="pCompleted">0</h2>
+              </div>
+              <div class="stat-card">
+                <p>Focus Sessions</p>
+                <h2 id="pSessions">0</h2>
+              </div>
+              <div class="stat-card">
+                <p>Remaining Tasks</p>
+                <h2 id="pRemaining">0</h2>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer>StudyMate | © 2026445578 | ammar rifqi | Prototype</footer>
+      </main>
+    </div>
+
+    <!-- ADD TASK POPUP -->
+    <div class="modal" id="taskModal">
+      <div class="modal-content">
+        <h2>Add New Task</h2>
+
+        <form id="taskForm">
+          <label>Task Name</label>
+          <input
+            type="text"
+            id="taskName"
+            placeholder="Enter task name..."
+            required
+          />
+
+          <label>Due Date</label>
+          <input type="date" id="taskDate" required />
+
+          <label>Priority</label>
+          <select id="taskPriority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+          </select>
+
+          <label>Category</label>
+          <select id="taskCategory">
+            <option>Study</option>
+            <option>Work</option>
+            <option>Personal</option>
+          </select>
+
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="closeModal">
+              Cancel
+            </button>
+            <button type="submit" class="primary-btn">Save Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ACCOUNT AND SYNC -->
+    <div class="modal" id="accountModal" aria-hidden="true">
+      <div
+        class="modal-content account-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="accountTitle"
+      >
+        <h2 id="accountTitle">Sync across devices</h2>
+        <p class="account-description" id="accountDescription">
+          Sign in to access your study tasks on your other devices.
+        </p>
+        <p
+          class="auth-status"
+          id="authStatus"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <form id="authForm">
+          <label for="authEmail">Email</label>
+          <input id="authEmail" type="email" autocomplete="email" required />
+
+          <label for="authPassword">Password</label>
+          <input
+            id="authPassword"
+            type="password"
+            autocomplete="current-password"
+            minlength="8"
+            required
+          />
+
+          <div class="modal-actions">
+            <button type="submit" class="primary-btn" id="authSubmit">
+              Sign in
+            </button>
+          </div>
+        </form>
+
+        <button
+          class="secondary-btn account-close-btn"
+          id="closeAccountModal"
+          type="button"
+        >
+          Close
+        </button>
+        <button class="auth-mode-toggle" id="authModeToggle" type="button">
+          Need an account? Sign up
+        </button>
+        <button
+          class="secondary-btn sign-out-btn"
+          id="signOutButton"
+          type="button"
+          hidden
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+
+    <!-- THEME COLOUR -->
+    <div class="modal" id="paletteModal" aria-hidden="true">
+      <div
+        class="modal-content palette-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="paletteTitle"
+      >
+        <h2 id="paletteTitle">Theme colour</h2>
+        <p class="palette-description">
+          Choose a soft pastel accent. It applies immediately and is saved on
+          this device.
+        </p>
+
+        <div
+          class="palette-options"
+          role="group"
+          aria-label="Pastel theme colours"
+        >
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="sage"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-sage"
+              aria-hidden="true"
+            ></span>
+            <span>Sage</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="mint"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-mint"
+              aria-hidden="true"
+            ></span>
+            <span>Mint</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="lavender"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-lavender"
+              aria-hidden="true"
+            ></span>
+            <span>Lavender</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="rose"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-rose"
+              aria-hidden="true"
+            ></span>
+            <span>Rose</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="sky"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-sky"
+              aria-hidden="true"
+            ></span>
+            <span>Sky</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+          <button
+            class="palette-option"
+            type="button"
+            data-palette="peach"
+            aria-pressed="false"
+          >
+            <span
+              class="palette-preview palette-preview-peach"
+              aria-hidden="true"
+            ></span>
+            <span>Peach</span>
+            <span class="palette-option-check" aria-hidden="true">✓</span>
+          </button>
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-btn" id="closePaletteModal" type="button">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEKLY FOCUS GOAL -->
+    <div class="modal" id="weeklyGoalModal" aria-hidden="true">
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="weeklyGoalTitle"
+      >
+        <h2 id="weeklyGoalTitle">Set your weekly focus goal</h2>
+        <p class="account-description">
+          Choose how many completed focus sessions you want to reach each week.
+        </p>
+        <form id="weeklyGoalForm">
+          <label for="weeklyGoalInput">Sessions per week</label>
+          <input
+            id="weeklyGoalInput"
+            type="number"
+            min="1"
+            max="40"
+            step="1"
+            required
+          />
+          <div class="modal-actions">
+            <button
+              class="secondary-btn"
+              id="closeWeeklyGoalModal"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button class="primary-btn" type="submit">Save goal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
